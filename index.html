@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>你像哪位文学大师？性格测试</title>
+<style>
+  :root{
+    --bg:#111827;
+    --card:#1f2937;
+    --ink:#e5e7eb;
+    --muted:#9ca3af;
+    --brand:#7c3aed;
+    --brand-2:#06b6d4;
+    --good:#22c55e;
+    --warn:#f59e0b;
+    --bad:#ef4444;
+    --paper:#f9fafb;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(1200px 600px at 70% -20%, rgba(124,58,237,0.15), transparent 70%),
+      radial-gradient(900px 500px at -10% 10%, rgba(6,182,212,0.14), transparent 60%),
+      linear-gradient(180deg, #0b1220, #0b1220 40%, #0e1528);
+    overflow-x:hidden;
+  }
+
+  .blob{
+    position:absolute; border-radius:50%;
+    filter: blur(12px); opacity:.4; pointer-events:none;
+    animation: float 12s ease-in-out infinite;
+    mix-blend-mode: screen;
+  }
+  .blob.b1{ width:220px; height:220px; background:#7c3aed; top:10vh; left:-60px; animation-delay:-2s}
+  .blob.b2{ width:180px; height:180px; background:#06b6d4; top:60vh; right:-40px; animation-delay:-4s}
+  .blob.b3{ width:140px; height:140px; background:#f97316; top:30vh; right:20vw; animation-delay:-6s}
+  @keyframes float{
+    0%,100%{ transform:translateY(0) translateX(0) }
+    50%{ transform:translateY(-18px) translateX(8px) }
+  }
+
+  .wrap{ max-width:1000px; margin:0 auto; padding:20px; }
+  header{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    position:sticky; top:0; z-index:50; padding:12px 16px; margin:-12px -16px 8px;
+    background:linear-gradient(180deg, rgba(15,23,42,.9), rgba(15,23,42,.6));
+    backdrop-filter: blur(8px);
+    border-bottom:1px solid rgba(255,255,255,.06);
+  }
+  .logo{
+    display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:.5px;
+  }
+  .mascot{ width:36px; height:36px; }
+  .tabs{ display:flex; gap:8px; flex-wrap:wrap; }
+  .tab-btn{
+    background:transparent; border:1px solid rgba(255,255,255,.18); color:var(--ink);
+    padding:8px 12px; border-radius:999px; cursor:pointer; transition:.2s;
+  }
+  .tab-btn.active{ background:var(--brand); border-color:transparent }
+  .storage-pill{
+    display:inline-flex; align-items:center; gap:6px;
+    border:1px dashed rgba(255,255,255,.25); padding:6px 10px; border-radius:10px; color:var(--muted); margin-left:8px;
+  }
+
+  .card{
+    background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:16px; padding:18px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.25);
+  }
+  .hero{ display:grid; grid-template-columns: 1.2fr .8fr; gap:16px; align-items:center; }
+  @media (max-width: 860px){ .hero{ grid-template-columns: 1fr; } }
+  h1{ margin:0 0 8px; font-size:28px }
+  p.lead{ color:var(--muted); margin:6px 0 12px; line-height:1.6 }
+  .pill{
+    display:inline-flex; align-items:center; gap:8px;
+    border:1px dashed rgba(255,255,255,.2); padding:8px 12px; border-radius:12px; color:var(--muted);
+  }
+  .row{ display:flex; gap:10px; flex-wrap:wrap; }
+  .input, .btn{
+    padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.14);
+    background:rgba(255,255,255,.04); color:var(--ink);
+    outline:none; min-width:0;
+  }
+  .input::placeholder{ color:#94a3b8 }
+  .btn{
+    background:linear-gradient(135deg, var(--brand), #a855f7);
+    border:none; cursor:pointer; transition: transform .06s ease, box-shadow .2s ease;
+    color:white; font-weight:600;
+    box-shadow: 0 6px 16px rgba(124,58,237,.4), inset 0 0 0 1px rgba(255,255,255,.2);
+  }
+  .btn:hover{ transform: translateY(-1px) }
+  .btn:active{ transform: translateY(0) scale(.98) }
+  .btn.ghost{ background:transparent; border:1px solid rgba(255,255,255,.2); box-shadow:none; color:var(--ink) }
+  .btn.alt{ background:linear-gradient(135deg, var(--brand-2), #22d3ee); box-shadow:0 6px 16px rgba(6,182,212,.35) }
+  .btn.warn{ background:linear-gradient(135deg, var(--warn), #fb923c); box-shadow:0 6px 16px rgba(245,158,11,.4) }
+  .btn.good{ background:linear-gradient(135deg, var(--good), #4ade80); box-shadow:0 6px 16px rgba(34,197,94,.35) }
+
+  .quiz{ display:none; }
+  .quiz.active{ display:block; }
+  .progress{
+    height:10px; background:rgba(255,255,255,.06); border-radius:999px; overflow:hidden;
+    border:1px solid rgba(255,255,255,.08);
+  }
+  .progress > div{ height:100%; width:0%;
+    background: linear-gradient(90deg, #22d3ee, #a78bfa, #f472b6);
+    background-size:200% 100%; animation: flow 3s linear infinite;
+  }
+  @keyframes flow{ 0%{background-position:0 0} 100%{background-position:200% 0} }
+
+  .q-wrap{ margin-top:12px; min-height:240px; }
+  .q-title{ font-weight:700; font-size:18px; margin-bottom:12px; }
+  .options{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  @media (max-width:680px){ .options{ grid-template-columns:1fr } }
+  .opt{
+    display:flex; gap:10px; align-items:flex-start;
+    padding:12px; border-radius:12px; position:relative;
+    background:rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.08);
+    cursor:pointer; transition:.15s ease;
+    overflow:hidden;
+  }
+  .opt:hover{ transform: translateY(-2px); border-color: rgba(255,255,255,.18) }
+  .opt:active{ transform: translateY(0) scale(.99) }
+  .opt .badge{
+    width:28px; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(135deg, #a78bfa, #22d3ee);
+    font-weight:800; color:#0b1220;
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,.7);
+    flex:0 0 auto;
+  }
+  .opt .text{ line-height:1.5 }
+  .opt .shine{
+    position:absolute; inset:0; background: radial-gradient(400px 80px at var(--x,0) var(--y,0), rgba(255,255,255,.09), transparent 60%);
+    pointer-events:none; transition: .1s;
+  }
+
+  .result{ display:none; }
+  .result.active{ display:block; }
+  .result-head{ display:grid; grid-template-columns: 1.1fr .9fr; gap:14px; align-items:stretch; }
+  @media (max-width:860px){ .result-head{ grid-template-columns:1fr } }
+  .title{ display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .title .badge{
+    width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(135deg, #fda4af, #a78bfa); color:#0b1220; font-weight:900;
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,.8);
+  }
+  .tags{ display:flex; flex-wrap:wrap; gap:8px; margin-top:6px }
+  .tag{
+    padding:4px 8px; border-radius:999px; font-size:12px; color:white;
+    background:linear-gradient(135deg, rgba(6,182,212,.8), rgba(124,58,237,.8));
+    border:1px solid rgba(255,255,255,.2);
+  }
+  .quote{ margin-top:8px; padding:10px; border-left:3px solid var(--brand-2); background:rgba(255,255,255,.03); border-radius:8px }
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:12px }
+  @media (max-width:680px){ .grid2{ grid-template-columns:1fr } }
+
+  .top3{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+  .chip{
+    padding:8px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.04); display:inline-flex; gap:8px; align-items:center;
+  }
+  .bar{ height:8px; width:120px; background:rgba(255,255,255,.08); border-radius:999px; overflow:hidden }
+  .bar > i{ display:block; height:100%; width:0; background:linear-gradient(90deg, #22d3ee, #a78bfa); }
+
+  .chart{ background:rgba(255,255,255,.02); border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:10px }
+
+  .dashboard{ display:none }
+  .dashboard.active{ display:block }
+  .importer{ display:grid; grid-template-columns:1fr; gap:8px }
+  .textarea{ width:100%; min-height:120px; padding:10px; border-radius:10px;
+    background:rgba(255,255,255,.04); color:var(--ink); border:1px solid rgba(255,255,255,.14);
+  }
+
+  .confetti{ position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:999; }
+  .confetti i{
+    position:absolute; width:8px; height:14px; border-radius:2px; opacity:0;
+    animation: fall linear forwards;
+  }
+  @keyframes fall{
+    0%{ transform: translateY(-10vh) rotate(0); opacity:1 }
+    100%{ transform: translateY(110vh) rotate(540deg); opacity:0 }
+  }
+
+  @media print{
+    body{ background:white; color:#111; }
+    header, .hero, .quiz, .result, .tabs, .blob, .confetti, .student-only{ display:none !important }
+    .dashboard{ display:block !important }
+    .card{ border:none; box-shadow:none; }
+    .print-page{ page-break-after:always; }
+    .btn{ display:none !important }
+  }
+</style>
+</head>
+<body>
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+
+  <div class="confetti" id="confetti"></div>
+
+  <header>
+    <div class="logo">
+      <svg class="mascot" viewBox="0 0 64 64" aria-hidden="true">
+        <defs>
+          <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#22d3ee"/>
+            <stop offset="1" stop-color="#a78bfa"/>
+          </linearGradient>
+        </defs>
+        <rect x="8" y="12" rx="8" ry="8" width="40" height="44" fill="url(#g1)" stroke="#0b1220" stroke-width="2"/>
+        <path d="M10 20h36" stroke="#0b1220" stroke-width="2"/>
+        <circle cx="24" cy="32" r="3" fill="#0b1220"/>
+        <circle cx="36" cy="32" r="3" fill="#0b1220"/>
+        <path d="M22 40q10 6 20 0" fill="none" stroke="#0b1220" stroke-width="2" stroke-linecap="round"/>
+        <polygon points="54,8 58,18 48,14" fill="#fbbf24"/>
+      </svg>
+      <div>你像哪位文学大师？</div>
+      <span class="storage-pill" id="storageMode">存储模式检测中…</span>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" id="tabStudent">学生端</button>
+      <button class="tab-btn" id="tabTeacher">教师端</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero card student-only" id="welcome">
+      <div>
+        <h1>用气质，遇见你的文学同路人</h1>
+        <p class="lead">通过12-15道场景化选择题，匹配与你最接近的文学大师气质。结果页提供“相遇短章+引文”、学习秘籍与延伸阅读。支持加入班级并导出班级画像。</p>
+        <div class="row" style="margin:10px 0">
+          <input class="input" id="nickname" placeholder="昵称（可选）" />
+          <input class="input" id="classId" placeholder="班级码（如 2025-7A）" />
+        </div>
+        <div class="row">
+          <button class="btn" id="startBtn">开始测试</button>
+          <button class="btn alt" id="howBtn">怎么玩？</button>
+        </div>
+      </div>
+      <div class="card" style="min-height:220px; display:grid; place-items:center; background:linear-gradient(180deg, rgba(124,58,237,.15), rgba(6,182,212,.12));">
+        <svg viewBox="0 0 400 260" style="width:100%; height:auto" aria-hidden="true">
+          <defs>
+            <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#0ea5e9"/>
+              <stop offset="1" stop-color="#7c3aed"/>
+            </linearGradient>
+          </defs>
+          <rect width="400" height="260" rx="16" fill="url(#sky)" opacity=".25"/>
+          <g>
+            <circle cx="320" cy="60" r="18" fill="#fde68a"/>
+            <g fill="#93c5fd" opacity=".9">
+              <ellipse cx="80" cy="80" rx="28" ry="16"/>
+              <ellipse cx="110" cy="86" rx="24" ry="14"/>
+              <ellipse cx="95" cy="72" rx="20" ry="12"/>
+            </g>
+            <g transform="translate(50,150)">
+              <rect x="0" y="0" width="120" height="80" rx="10" fill="#f3e8ff" stroke="#6d28d9" stroke-width="3"/>
+              <circle cx="30" cy="30" r="6" fill="#0ea5e9"/>
+              <circle cx="54" cy="30" r="6" fill="#0ea5e9"/>
+              <path d="M25 50q16 10 32 0" stroke="#6d28d9" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <text x="12" y="70" font-size="12" fill="#6d28d9">Book Buddy</text>
+            </g>
+            <path d="M210 200 q40 -30 80 0" stroke="#22d3ee" stroke-width="6" fill="none" stroke-linecap="round" opacity=".8"/>
+            <path d="M210 210 q40 -30 80 0" stroke="#a78bfa" stroke-width="6" fill="none" stroke-linecap="round" opacity=".8"/>
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <section class="card student-only" id="how" style="display:none">
+      <h3 style="margin:0 0 8px">玩法提示</h3>
+      <ol style="margin:6px 0 0 18px; line-height:1.8; color:var(--muted)">
+        <li>每题选一项，答案没有好坏之分；题目与选项顺序会随机。</li>
+        <li>完成后可“保存到本机”（若存储受限会下载JSON）或“复制分享码”交给老师导入。</li>
+        <li>加入班级码可参与班级画像统计。</li>
+      </ol>
+    </section>
+
+    <section class="quiz card" id="quiz">
+      <div class="row" style="align-items:center; justify-content:space-between">
+        <div class="pill">进度</div>
+        <div class="pill" id="whoami">昵称：—｜班级：—</div>
+      </div>
+      <div class="progress" style="margin:10px 0 6px">
+        <div id="progbar"></div>
+      </div>
+      <div class="q-wrap">
+        <div class="q-title" id="qTitle">题目加载中…</div>
+        <div class="options" id="qOptions"></div>
+      </div>
+      <div class="row" style="justify-content:space-between; margin-top:10px">
+        <button class="btn ghost" id="prevBtn">上一步</button>
+        <button class="btn" id="nextBtn">下一题</button>
+      </div>
+    </section>
+
+    <section class="result card" id="result">
+      <div class="result-head">
+        <div>
+          <div class="title">
+            <div class="badge" id="rRank">TOP</div>
+            <div>
+              <div style="font-size:20px; font-weight:800"><span id="rName"></span>｜<span id="rTitle"></span></div>
+              <div class="tags" id="rTags"></div>
+            </div>
+          </div>
+          <div class="quote" id="rShort"></div>
+          <div class="quote" id="rQuote" style="border-left-color:#f59e0b"></div>
+          <div class="grid2" style="margin-top:10px">
+            <div>
+              <h4 style="margin:8px 0">课堂秘籍</h4>
+              <ul id="rTips" style="margin:0 0 0 18px; line-height:1.8; color:var(--muted)"></ul>
+            </div>
+            <div>
+              <h4 style="margin:8px 0">破冰话题</h4>
+              <ul id="rIce" style="margin:0 0 0 18px; line-height:1.8; color:var(--muted)"></ul>
+            </div>
+          </div>
+          <div style="margin-top:8px">
+            <h4 style="margin:8px 0">延伸阅读</h4>
+            <div id="rRead" class="tags"></div>
+          </div>
+        </div>
+        <div>
+          <div class="chart" id="radarBox">
+            <svg id="radar" viewBox="0 0 260 240" width="100%" height="240" aria-label="雷达图"></svg>
+          </div>
+          <div class="chart" style="margin-top:10px">
+            <div style="font-weight:700; margin-bottom:6px">与你最接近的Top3</div>
+            <div class="top3" id="top3"></div>
+          </div>
+          <div class="row" style="margin-top:10px; flex-wrap:wrap; gap:8px">
+            <button class="btn alt" id="saveLocal">保存到本机</button>
+            <button class="btn" id="copyShare">复制分享码</button>
+            <button class="btn ghost" id="restart">再测一次</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard card" id="dashboard">
+      <div class="row" style="align-items:end; gap:10px">
+        <div style="flex:1">
+          <label>班级码</label>
+          <input class="input" id="tClassId" placeholder="如 2025-7A" />
+        </div>
+        <button class="btn good" id="loadClass">加载本机数据</button>
+        <button class="btn alt" id="printPDF">导出PDF</button>
+      </div>
+      <div class="grid2" style="margin-top:10px">
+        <div class="chart">
+          <div style="font-weight:700; margin-bottom:6px">班级六维气质雷达</div>
+          <svg id="tRadar" viewBox="0 0 260 240" width="100%" height="240"></svg>
+        </div>
+        <div class="chart">
+          <div style="font-weight:700; margin-bottom:6px">Top1人物分布</div>
+          <svg id="tBars" viewBox="0 0 300 240" width="100%" height="240"></svg>
+        </div>
+      </div>
+      <div class="card" style="margin-top:10px">
+        <h4 style="margin:4px 0">阅读清单（建议）</h4>
+        <div id="tReading" class="tags"></div>
+      </div>
+      <div class="card" style="margin-top:10px">
+        <h4 style="margin:4px 0">教学活动建议</h4>
+        <ul id="tActivities" style="margin:0 0 0 18px; line-height:1.8; color:var(--muted)"></ul>
+      </div>
+      <div class="card" style="margin-top:10px">
+        <h4 style="margin:4px 0">粘贴分享码快速收集</h4>
+        <div class="importer">
+          <textarea class="textarea" id="pasteBox" placeholder="让学生复制分享码到这里（可多条，换行分隔）"></textarea>
+          <div class="row">
+            <button class="btn" id="importBtn">导入到本机</button>
+            <button class="btn ghost" id="clearClass">清空本机该班数据</button>
+          </div>
+          <div id="importInfo" class="pill" style="display:none"></div>
+        </div>
+      </div>
+      <div class="print-page"></div>
+    </section>
+  </main>
+
+<!-- PDF库：若加载失败，自动回退为PNG导出 -->
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+/* UTF-8 safe Base64 */
+function utoa(str){ return btoa(unescape(encodeURIComponent(str))); }
+function atou(b64){ return decodeURIComponent(escape(atob(b64))); }
+
+/* Safe storage wrapper */
+function createStorage(){
+  try{ const k="__probe__"; localStorage.setItem(k,"1"); localStorage.removeItem(k);
+    return { mode:"localStorage", getItem:(k)=>localStorage.getItem(k), setItem:(k,v)=>localStorage.setItem(k,v), removeItem:(k)=>localStorage.removeItem(k) };
+  }catch(e){
+    const mem=new Map();
+    return { mode:"memory", getItem:(k)=>mem.get(k)||null, setItem:(k,v)=>mem.set(k,v), removeItem:(k)=>mem.delete(k) };
+  }
+}
+const Storage = createStorage();
+document.getElementById("storageMode").textContent =
+  Storage.mode === "localStorage" ? "存储模式：本机浏览器（可持久保存）" : "存储模式：内存（沙盒限制，刷新后丢失）";
+
+/* Data: axes, personas, questions */
+const AXES = { A:"现实 ↔ 浪漫", B:"规整 ↔ 自由", C:"忧思 ↔ 乐观", D:"豪放 ↔ 细腻", E:"都市 ↔ 乡土", F:"批判 ↔ 温情" };
+const START_VECTOR = {A:3, B:3, C:3, D:3, E:3, F:3};
+const PERSONAS = [
+  { id:1,  name:"屈原", title:"浪漫的家国之脉", tags:["爱国","浪漫","孤高"], vec:[5,3,1,4,4,2],
+    short:"你把理想当作航标，愿意为信念逆流而上。情感浓烈、审美高标，对不公与不美敏感，也因此拥有改变的勇气。",
+    quote:"路漫漫其修远兮，吾将上下而求索。（《离骚》）",
+    tips:["写景用“意象接力”","议论文敢立场，给一处反例"],
+    ice:["什么事值得“逆流而上”？","你最喜欢的意象是什么？"],
+    read:{core:["离骚（选段）"], extend:["中国古代抒情传统（节选）"]}},
+  { id:2,  name:"陶渊明", title:"人间有桃花源", tags:["淡泊","自然","理想主义"], vec:[4,5,4,4,5,5],
+    short:"你向往清简与秩序，在喧嚣中保存一方自留地。不争不抢，却以从容影响他人。",
+    quote:"采菊东篱下，悠然见南山。（《饮酒·其五》）",
+    tips:["以实入虚","记录身边的小宁静"],
+    ice:["半天只给你自己会做什么？","你的“桃花源”在哪？"],
+    read:{core:["桃花源记"], extend:["瓦尔登湖（节选）"]}},
+  { id:3,  name:"李白", title:"把星河揣进口袋", tags:["豪放","自由","想象力"], vec:[5,5,5,2,3,4],
+    short:"你像不熄的火花，热情外放、敢爱敢恨。夸张与比兴是你的特长，让平凡开出奇花。",
+    quote:"仰天大笑出门去，我辈岂是蓬蒿人。（《南陵别儿童入京》）",
+    tips:["比喻升级训练","口头表达先行"],
+    ice:["你做过最“即兴”的事？","今天写成一首歌叫什么？"],
+    read:{core:["将进酒"], extend:["惠特曼诗选（节选）"]}},
+  { id:4,  name:"杜甫", title:"把人间装进行囊", tags:["忧国忧民","现实主义"], vec:[2,3,1,4,4,2],
+    short:"你观察入微、同理深切。你不轻言乐观，却可靠稳重，是团队的定盘星。",
+    quote:"感时花溅泪，恨别鸟惊心。（《春望》）",
+    tips:["素材分门别类","先摆事实再抒怀"],
+    ice:["最近让你动容的一则“小新闻”？","校园里你最心疼的角落？"],
+    read:{core:["茅屋为秋风所破歌"], extend:["报告文学作品选（节选）"]}},
+  { id:5,  name:"苏轼", title:"人生长河一叶舟", tags:["豁达","多才","乐观"], vec:[4,4,5,3,3,5],
+    short:"你将生活过成手作坊：诗文画厨皆通。逆境能转念，把难题化成幽默与创意。",
+    quote:"但愿人长久，千里共婵娟。（《水调歌头》）",
+    tips:["同题多体裁","逆境写“转折”"],
+    ice:["今天哪个瞬间“也无风雨也无晴”？","你会拿什么做“人生下酒菜”？"],
+    read:{core:["赤壁赋"], extend:["人间词话（节选）"]}},
+  { id:6,  name:"李清照", title:"一半风荷一半火", tags:["细腻","坚韧","婉约与豪情"], vec:[4,3,2,5,3,5],
+    short:"你把锋芒藏进温柔里，分寸感拿捏得准。关键时刻能顶住，层次分明地表达情绪。",
+    quote:"寻寻觅觅，冷冷清清，凄凄惨惨戚戚。（《声声慢》）",
+    tips:["意象串联时间线","情感层级写作"],
+    ice:["什么是你心中的“分寸感”？","有哪些“不说也懂”的瞬间？"],
+    read:{core:["声声慢"], extend:["纳兰词（节选）"]}},
+  { id:7,  name:"鲁迅", title:"把灯光打在问题上", tags:["批判精神","深刻","冷峻"], vec:[2,3,1,3,2,1],
+    short:"你天生爱追问“为什么”，愿意把问题摊在光下。冷静有锋芒，是班级思考引擎。",
+    quote:"横眉冷对千夫指，俯首甘为孺子牛。（《自嘲》）",
+    tips:["议论文反向提问三连","论据多元"],
+    ice:["你改变过的一个观点？","你想为谁发声？"],
+    read:{core:["故乡"], extend:["呐喊（节选）"]}},
+  { id:8,  name:"老舍", title:"让日子有点幽默", tags:["幽默","市井关怀","语言大师"], vec:[3,2,3,3,2,4],
+    short:"你在烟火气里发现温度，用俏皮话包裹认真。接地气而有分寸，是团队润滑剂。",
+    quote:"济南的冬天是个温晴的冬天。（《济南的冬天》）",
+    tips:["对白训练","口语化表达的节制使用"],
+    ice:["你最拿手的段子？","哪件小事最“人间”？"],
+    read:{core:["骆驼祥子（节选）"], extend:["世说新语（节选）"]}},
+  { id:9,  name:"朱自清", title:"在光影里留住体面", tags:["深情","典雅","敏锐"], vec:[3,3,3,5,3,5],
+    short:"你注重格调与细节，把“看见”说清楚。节制的情感，自有分量与余韵。",
+    quote:"我看见他的背影，我的眼泪很快地流下来了。（《背影》）",
+    tips:["动静互证描写","段落末尾点题句"],
+    ice:["最近的一个“细节美”？","用一句话写“春天的声音”。"],
+    read:{core:["背影"], extend:["围城（节选）"]}},
+  { id:10, name:"冰心", title:"把爱化作小星星", tags:["纯真","童心","爱"], vec:[4,3,5,5,3,5],
+    short:"你带来抚慰与光，善于捕捉温软瞬间。看似轻柔，实则稳定而宽和。",
+    quote:"成功的花……当初她的芽儿，浸透了奋斗的泪泉，洒满了牺牲的血雨。（《繁星·春水》）",
+    tips:["儿童视角改写","以小见大结构"],
+    ice:["童年最珍贵的一样东西？","今天还在吗？"],
+    read:{core:["繁星·春水"], extend:["小王子"]}},
+  { id:11, name:"沈从文", title:"让风在边城吹", tags:["乡土","唯美","人道主义"], vec:[4,3,3,5,5,5],
+    short:"你贴近土地与人情，叙述清澈，讲究质地与节奏。你能把“慢”变成美学。",
+    quote:"这个人也许永远不回来了，也许明天回来。（《边城》）",
+    tips:["方位词与手势词入文","长短句交替控节奏"],
+    ice:["你最熟悉的一条路？","一天中何时最好看？"],
+    read:{core:["边城（节选）"], extend:["汪曾祺散文"]}},
+  { id:12, name:"钱钟书", title:"笑里有学问", tags:["睿智","讽刺","学贯中西"], vec:[2,2,3,3,1,2],
+    short:"你思维快、类比强，爱拆台但不翻桌。幽默是一种洞见，你用它拆解复杂。",
+    quote:"婚姻就像一座围城，城外的人想进来，城里的人想出去。（《围城》）",
+    tips:["类比与对照","引文注明来源与语境"],
+    ice:["最近的“冷知识类比”？","最服气的一句讽刺？"],
+    read:{core:["围城（节选）"], extend:["谈修辞"]}},
+  { id:13, name:"艾青", title:"把土地揣进胸口", tags:["土地情结","深沉","时代感"], vec:[4,3,2,2,5,2],
+    short:"你与集体命运共振，情感厚重却不滞。写现实，也写出光与温度。",
+    quote:"为什么我的眼里常含泪水？因为我对这土地爱得深沉。（《我爱这土地》）",
+    tips:["意象复现构图","尝试“我们”的第一人称"],
+    ice:["你最想为哪一群人写一段话？","为什么？"],
+    read:{core:["我爱这土地"], extend:["《断章》（卞之琳）"]}},
+  { id:14, name:"余光中", title:"让乡愁有形状", tags:["文化乡愁","语言炼金"], vec:[4,3,2,4,4,4],
+    short:"你将私人记忆铸成公共情感，语言讲究熔炼与韵味，让距离与时间可触可感。",
+    quote:"小时候，乡愁是一枚小小的邮票……（《乡愁》）",
+    tips:["多感官联结","词语陌生化练习"],
+    ice:["“远方”的味道是什么？","用两种颜色形容它。"],
+    read:{core:["乡愁"], extend:["叶芝诗选（节选）"]}},
+  { id:15, name:"史铁生", title:"在思考里行走", tags:["哲思","生命感悟","坚韧"], vec:[3,3,2,5,3,4],
+    short:"你愿意和自己深谈，从困境里提炼清明。悲悯而有定力，慢慢走，能走得深。",
+    quote:"痛苦像一把刀子，或者将你雕刻成一件艺术品，或者把你削成一块废铁。（语）",
+    tips:["叙议嵌套","“自问自答”结构"],
+    ice:["你最近问过自己的一个难题？","你如何与不完美相处？"],
+    read:{core:["我与地坛（节选）"], extend:["活出意义来"]}},
+];
+const QUESTIONS = [
+  { id:1,  text:"放学遇到突如其来的大雨，你最可能…", options:[
+    {k:"A", text:"甩开书包踩水回家", eff:{B:1}},
+    {k:"B", text:"借伞结伴稳稳到家", eff:{B:-1}},
+    {k:"C", text:"停在屋檐下看雨丝与涟漪", eff:{D:1}},
+    {k:"D", text:"拍一段雨的视频配文案", eff:{F:1}},
+  ]},
+  { id:2,  text:"小组作业刚分配，你会…", options:[
+    {k:"A", text:"做进度表和分工表", eff:{B:-1}},
+    {k:"B", text:"带队头脑风暴想点子", eff:{B:1}},
+    {k:"C", text:"默默打磨细节补台", eff:{D:1}},
+    {k:"D", text:"觉得质量不够宁愿延期", eff:{C:-1}},
+  ]},
+  { id:3,  text:"走失在陌生小巷时，你会…", options:[
+    {k:"A", text:"问路按指示走", eff:{B:-1}},
+    {k:"B", text:"顺着感觉探索再说", eff:{B:1}},
+    {k:"C", text:"研究门匾砖缝与旧墙故事", eff:{E:1}},
+    {k:"D", text:"拍照吐槽导视系统", eff:{F:-1}},
+  ]},
+  { id:4,  text:"临时被请上台演讲，你更可能…", options:[
+    {k:"A", text:"即兴讲一个亲历故事", eff:{D:-1}},
+    {k:"B", text:"用几句古典意象开场", eff:{A:1}},
+    {k:"C", text:"从现实问题切入", eff:{A:-1}},
+    {k:"D", text:"温和地谈一段心情", eff:{F:1}},
+  ]},
+  { id:5,  text:"书架只剩一个名额，你选…", options:[
+    {k:"A", text:"诗集", eff:{A:1}},
+    {k:"B", text:"杂文集", eff:{F:-1}},
+    {k:"C", text:"自然笔记与博物学", eff:{E:1}},
+    {k:"D", text:"城市纪实写作", eff:{A:-1}},
+  ]},
+  { id:6,  text:"周末安排，你会…", options:[
+    {k:"A", text:"郊野露营看云", eff:{E:1}},
+    {k:"B", text:"市图书馆自习", eff:{B:-1}},
+    {k:"C", text:"漫游美术馆慢慢看", eff:{D:1}},
+    {k:"D", text:"街头即兴表演或快闪", eff:{D:-1}},
+  ]},
+  { id:7,  text:"同学被误解，你会…", options:[
+    {k:"A", text:"列证据澄清事实", eff:{F:-1}},
+    {k:"B", text:"私下安慰并沟通", eff:{F:1}},
+    {k:"C", text:"写一段换位思考的小文", eff:{D:1}},
+    {k:"D", text:"开个玩笑化解气氛", eff:{C:1}},
+  ]},
+  { id:8,  text:"比赛失利之后，你更倾向…", options:[
+    {k:"A", text:"复盘制定训练表", eff:{B:-1}},
+    {k:"B", text:"写点文字留住心情", eff:{A:1}},
+    {k:"C", text:"正面指出不公平之处", eff:{F:-1}},
+    {k:"D", text:"请队友吃冰淇淋", eff:{C:1}},
+  ]},
+  { id:9,  text:"校园里你最爱的角落是…", options:[
+    {k:"A", text:"操场的风", eff:{C:1}},
+    {k:"B", text:"老槐树下", eff:{E:1}},
+    {k:"C", text:"阅览室窗边", eff:{D:1}},
+    {k:"D", text:"校门口的街市", eff:{E:-1}},
+  ]},
+  { id:10, text:"看电影时，你最在意…", options:[
+    {k:"A", text:"镜头与光影", eff:{D:1}},
+    {k:"B", text:"社会议题的锋利度", eff:{F:-1}},
+    {k:"C", text:"情感与配乐的温度", eff:{F:1}},
+    {k:"D", text:"主人公“不服输”的劲儿", eff:{C:1}},
+  ]},
+  { id:11, text:"当规则限制创意时，你会…", options:[
+    {k:"A", text:"先按规则把事做成", eff:{B:-1}},
+    {k:"B", text:"在夹缝里玩出花", eff:{B:1}},
+    {k:"C", text:"建议修改规则", eff:{F:-1}},
+    {k:"D", text:"换一种更诗性的表达", eff:{A:1}},
+  ]},
+  { id:12, text:"晨读时，你更愿意…", options:[
+    {k:"A", text:"背诵古典名句", eff:{A:1}},
+    {k:"B", text:"临帖/练字", eff:{D:1}},
+    {k:"C", text:"读时评热文", eff:{F:-1}},
+    {k:"D", text:"记录天光与露珠", eff:{E:1}},
+  ]},
+  { id:13, text:"命题作文《风》，你会写…", options:[
+    {k:"A", text:"城市天际线里的风", eff:{E:-1}},
+    {k:"B", text:"田野麦浪起伏的风", eff:{E:1}},
+    {k:"C", text:"心里那股向前的风", eff:{B:1}},
+    {k:"D", text:"久别重逢的一声叹息", eff:{C:-1}},
+  ]},
+  { id:14, text:"在班里的常见角色，你是…", options:[
+    {k:"A", text:"气氛组", eff:{C:1}},
+    {k:"B", text:"调解员", eff:{F:1}},
+    {k:"C", text:"“显微镜”找细节", eff:{D:1}},
+    {k:"D", text:"反套路吐槽担当", eff:{F:-1}},
+  ]},
+  { id:15, text:"毕业旅行你选…", options:[
+    {k:"A", text:"古镇与渡口", eff:{E:1}},
+    {k:"B", text:"海岛露营", eff:{B:1}},
+    {k:"C", text:"首都博物馆群", eff:{E:-1}},
+    {k:"D", text:"山路夜观星", eff:{A:1}},
+  ]}
+];
+
+/* ====== Utilities ====== */
+const $ = s => document.querySelector(s);
+const state = { nickname:"", classId:"", order:[], qIndex:0, answers:{}, vector:{...START_VECTOR}, noise:()=>Math.random()*0.1-0.05 };
+function shuffle(a){ const b=a.slice(); for(let i=b.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [b[i],b[j]]=[b[j],b[i]];} return b; }
+function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
+function applyEffect(v, eff){ const out={...v}; Object.entries(eff).forEach(([k,val])=> out[k]=Math.max(1,Math.min(5,out[k]+val))); return out; }
+function computeVector(ans){ let v={...START_VECTOR}; state.order.forEach(qid=>{ const q=QUESTIONS.find(x=>x.id===qid); const idx=ans[qid]; if(idx==null) return; v=applyEffect(v,q._options[idx].eff); }); Object.keys(v).forEach(k=> v[k]=Math.max(1,Math.min(5,v[k]+state.noise()))); return v; }
+function euclid(a,b){ const k=["A","B","C","D","E","F"]; let s=0; for(let i=0;i<6;i++) s += Math.pow(a[k[i]]-b[i],2); return Math.sqrt(s); }
+const DMAX = Math.sqrt(6*16);
+function toSimilarity(d){ return Math.max(0,Math.min(1,1-d/DMAX)); }
+
+/* ====== Tabs ====== */
+const tabStudent=$("#tabStudent"), tabTeacher=$("#tabTeacher");
+const welcome=$("#welcome"), how=$("#how"), quiz=$("#quiz"), result=$("#result"), dashboard=$("#dashboard");
+tabStudent.addEventListener("click", ()=>{ tabStudent.classList.add("active"); tabTeacher.classList.remove("active"); [welcome,how].forEach(el=>el.style.display=""); quiz.classList.remove("active"); result.classList.remove("active"); dashboard.classList.remove("active"); });
+tabTeacher.addEventListener("click", ()=>{ tabTeacher.classList.add("active"); tabStudent.classList.remove("active"); [welcome,how].forEach(el=>el.style.display="none"); quiz.classList.remove("active"); result.classList.remove("active"); dashboard.classList.add("active"); });
+
+/* ====== Student flow ====== */
+$("#startBtn").addEventListener("click", startQuiz);
+$("#howBtn").addEventListener("click", ()=> $("#how").style.display = $("#how").style.display ? "" : "none" );
+$("#prevBtn").addEventListener("click", prevQ);
+$("#nextBtn").addEventListener("click", nextQ);
+$("#restart").addEventListener("click", ()=>{ result.classList.remove("active"); welcome.style.display=""; how.style.display="none"; state.qIndex=0; state.answers={}; state.vector={...START_VECTOR}; confetti(0); });
+
+function startQuiz(){
+  state.nickname = $("#nickname").value.trim() || "同学";
+  state.classId = $("#classId").value.trim() || "未分班";
+  $("#whoami").textContent = `昵称：${state.nickname}｜班级：${state.classId}`;
+  state.order = shuffle(QUESTIONS.map(q=>q.id));
+  QUESTIONS.forEach(q=> q._options = shuffle(q.options.map(o=>deepClone(o))));
+  state.qIndex=0; state.answers={}; state.vector={...START_VECTOR};
+  welcome.style.display="none"; how.style.display="none"; quiz.classList.add("active");
+  renderQ();
+}
+function renderQ(){
+  const idx=state.qIndex, qid=state.order[idx], q=QUESTIONS.find(x=>x.id===qid);
+  $("#qTitle").textContent = `Q${idx+1}. ${q.text}`;
+  const box=$("#qOptions"); box.innerHTML="";
+  q._options.forEach((opt,i)=>{
+    const div=document.createElement("div"); div.className="opt";
+    div.innerHTML=`<div class="badge">${opt.k}</div><div class="text">${opt.text}</div><div class="shine"></div>`;
+    div.addEventListener("mousemove",(e)=>{ const r=div.getBoundingClientRect(); div.style.setProperty("--x",(e.clientX-r.left)+"px"); div.style.setProperty("--y",(e.clientY-r.top)+"px"); });
+    div.addEventListener("click",()=>{ state.answers[qid]=i; div.animate([{transform:"translateY(0)"},{transform:"translateY(-3px)"},{transform:"translateY(0)"}],{duration:200}); setTimeout(nextQ,120); });
+    box.appendChild(div);
+  });
+  $("#progbar").style.width = `${Math.round(idx/state.order.length*100)}%`;
+  $("#prevBtn").disabled = idx===0;
+  $("#nextBtn").textContent = idx===state.order.length-1 ? "完成" : "下一题";
+}
+function prevQ(){ if(state.qIndex>0){ state.qIndex--; renderQ(); } }
+function nextQ(){ if(state.qIndex<state.order.length-1){ state.qIndex++; renderQ(); } else { finishQuiz(); } }
+
+/* ====== Result ====== */
+function finishQuiz(){
+  $("#progbar").style.width = `100%`;
+  state.vector = computeVector(state.answers);
+  const ranked = PERSONAS.map(p=>({ id:p.id, name:p.name, title:p.title, tags:p.tags, d:euclid(state.vector,p.vec), get s(){return toSimilarity(this.d);} }))
+                         .sort((a,b)=> b.s-a.s);
+  if(ranked.length>1 && Math.abs(ranked[0].s - ranked[1].s) <= 0.015){
+    const lastQids = state.order.slice(-3);
+    const bias = {A:0,B:0,C:0,D:0,E:0,F:0};
+    lastQids.forEach(qid=>{ const q=QUESTIONS.find(x=>x.id===qid); const opt=q._options[state.answers[qid]]; Object.entries(opt.eff).forEach(([k,v])=> bias[k]+=v); });
+    const prefer = p=>{ const v=PERSONAS.find(x=>x.id===p.id).vec; const keys=["A","B","C","D","E","F"]; let dot=0; for(let i=0;i<6;i++) dot += (v[i]-3)*(bias[keys[i]]||0); return dot; };
+    if(prefer(ranked[1]) > prefer(ranked[0])) [ranked[0],ranked[1]]=[ranked[1],ranked[0]];
+  }
+  const top1 = ranked[0], persona = PERSONAS.find(p=>p.id===top1.id);
+  $("#rRank").textContent="TOP 1";
+  $("#rName").textContent=top1.name;
+  $("#rTitle").textContent=top1.title;
+  $("#rTags").innerHTML = persona.tags.map(t=>`<span class="tag">${t}</span>`).join("");
+  $("#rShort").innerHTML = `<strong>相遇短章：</strong>${persona.short}`;
+  $("#rQuote").innerHTML = `<strong>引文：</strong>${persona.quote}`;
+  $("#rTips").innerHTML = persona.tips.map(t=>`<li>${t}</li>`).join("");
+  $("#rIce").innerHTML = persona.ice.map(t=>`<li>${t}</li>`).join("");
+  $("#rRead").innerHTML = [...persona.read.core.map(s=>`<span class="tag">教材：${s}</span>`), ...persona.read.extend.map(s=>`<span class="tag">拓展：${s}</span>`)].join("");
+  const top3box=$("#top3"); top3box.innerHTML="";
+  ranked.slice(0,3).forEach((t,i)=>{ const pct=Math.round(t.s*100); const chip=document.createElement("div"); chip.className="chip"; chip.innerHTML=`<strong>${i+1}. ${t.name}</strong><div class="bar"><i style="width:${pct}%"></i></div><span>${pct}%</span>`; top3box.appendChild(chip); setTimeout(()=> chip.querySelector("i").style.width=`${pct}%`, 50+i*100); });
+  drawRadar($("#radar"), state.vector, "你", true);
+  quiz.classList.remove("active"); result.classList.add("active"); confetti(60);
+}
+
+/* ====== Charts (SVG) ====== */
+function drawRadar(svgEl, vecObj, label, animate=false, meanLayer=null){
+  const svg=svgEl, w=260,h=240,cx=130,cy=120,rMax=90; svg.innerHTML=""; svg.setAttribute("viewBox",`0 0 ${w} ${h}`);
+  const axes=["A","B","C","D","E","F"]; const ang=axes.map((_,i)=> -Math.PI/2 + i*2*Math.PI/6);
+  for(let ring=1; ring<=4; ring++){ const rr=rMax*ring/4; const p=polygonPath(ang, rr, cx, cy); svg.appendChild(el("path",{d:p,fill:"none",stroke:"rgba(255,255,255,0.12)"})); }
+  axes.forEach((k,i)=>{ const a=ang[i], x=cx+rMax*Math.cos(a), y=cy+rMax*Math.sin(a); svg.appendChild(el("line",{x1:cx,y1:cy,x2:x,y2:y,stroke:"rgba(255,255,255,0.12)"})); const lx=cx+(rMax+16)*Math.cos(a), ly=cy+(rMax+16)*Math.sin(a); const t=el("text",{x:lx,y:ly,"text-anchor":(lx<cx?"end":(Math.abs(lx-cx)<6?"middle":"start")),"dominant-baseline":"central",fill:"#cbd5e1","font-size":"10"}); t.textContent=`${k} ${AXES[k]}`; svg.appendChild(t); });
+  if(meanLayer){ const pts=axes.map((k,i)=>{ const rr=(meanLayer[k]-1)/4*rMax; return [cx+rr*Math.cos(ang[i]), cy+rr*Math.sin(ang[i])];}); const d="M "+pts.map(p=>p.join(" ")).join(" L ")+" Z"; svg.appendChild(el("path",{d,fill:"rgba(16,185,129,0.15)",stroke:"rgba(16,185,129,0.6)","stroke-width":2})); }
+  const pts=axes.map((k,i)=>{ const rr=(vecObj[k]-1)/4*rMax; return [cx+rr*Math.cos(ang[i]), cy+rr*Math.sin(ang[i])];}); const d="M "+pts.map(p=>p.join(" ")).join(" L ")+" Z"; const poly=el("path",{d,fill:"rgba(124,58,237,0.18)",stroke:"rgba(124,58,237,0.8)","stroke-width":2}); svg.appendChild(poly);
+  if(animate){ poly.style.strokeDasharray=600; poly.style.strokeDashoffset=600; poly.animate([{strokeDashoffset:600},{strokeDashoffset:0}],{duration:800,easing:"ease-out",fill:"forwards"}); }
+}
+function polygonPath(angles, r, cx, cy){ const pts=angles.map(a=>[cx+r*Math.cos(a), cy+r*Math.sin(a)]); return "M "+pts.map(p=>p.join(" ")).join(" L ")+" Z"; }
+function el(tag, attrs){ const e=document.createElementNS("http://www.w3.org/2000/svg", tag); Object.entries(attrs||{}).forEach(([k,v])=> e.setAttribute(k,v)); return e; }
+
+/* ====== Dashboard ====== */
+document.getElementById("loadClass").addEventListener("click", ()=>{
+  const classId = document.getElementById("tClassId").value.trim();
+  if(!classId){ alert("请先输入班级码"); return; }
+  const items = loadClassLocal(classId);
+  if(items.length===0){
+    alert(Storage.mode==="localStorage"
+      ? "本机尚无该班数据。可让学生点“保存到本机”，或粘贴分享码导入。"
+      : "当前为内存模式：请让学生下载JSON并在本页面导入分享码，或立即导出PNG/PDF。");
+  }
+  renderDashboard(classId, items);
+});
+document.getElementById("importBtn").addEventListener("click", ()=>{
+  const classId = document.getElementById("tClassId").value.trim();
+  if(!classId){ alert("请先输入班级码"); return; }
+  const lines = document.getElementById("pasteBox").value.split(/\n+/).map(s=>s.trim()).filter(Boolean);
+  let ok=0, fail=0;
+  lines.forEach(line=>{
+    try{ const json = JSON.parse(atou(line)); json.classId = classId; saveLocal(json); ok++; }catch(e){ fail++; }
+  });
+  const info = document.getElementById("importInfo"); info.style.display=""; info.textContent=`导入成功 ${ok} 条，失败 ${fail} 条。`;
+  renderDashboard(classId, loadClassLocal(classId));
+});
+document.getElementById("clearClass").addEventListener("click", ()=>{
+  const classId = document.getElementById("tClassId").value.trim();
+  if(!classId){ alert("请先输入班级码"); return; }
+  if(confirm(`确认清空本机班级 ${classId} 的所有数据？`)){
+    const key = `literature-quiz::${classId}`; try{ Storage.removeItem(key); }catch(e){}
+    renderDashboard(classId, []);
+  }
+});
+
+/* 改造的导出：不再使用 window.print() */
+document.getElementById("printPDF").addEventListener("click", async ()=>{
+  const classId = document.getElementById("tClassId").value.trim();
+  if(!classId){ alert("请先输入班级码"); return; }
+  const items = loadClassLocal(classId);
+  if(items.length===0){ alert("无数据可导出，请先导入或保存结果。"); return; }
+  try{
+    await exportClassReport({ classId, items });
+  }catch(e){
+    console.error(e);
+    alert("导出失败，请重试或更换浏览器。");
+  }
+});
+
+function renderDashboard(classId, items){
+  const stats = aggregate(items);
+  drawRadar(document.getElementById("tRadar"), stats.meanAxes, "班级", false);
+  drawBars(document.getElementById("tBars"), stats.topCounts);
+  const reading = readingFromTop(stats.topCounts);
+  document.getElementById("tReading").innerHTML = reading.map(row => `<span class="tag">教材：${row.core}｜拓展：${row.extend}</span>`).join("");
+  const acts = activitiesFromAxes(stats.meanAxes);
+  document.getElementById("tActivities").innerHTML = acts.map(a=>`<li>${a}</li>`).join("");
+}
+function drawBars(svgEl, topCounts){
+  const svg=svgEl; svg.innerHTML="";
+  const w=300,h=240,pad=30, barH=16,gap=8, maxCount=Math.max(1,...topCounts.map(t=>t.count));
+  const totalH = topCounts.length*(barH+gap)+pad;
+  svg.setAttribute("viewBox",`0 0 ${w} ${Math.max(h,totalH)}`);
+  topCounts.forEach((t,i)=>{
+    const y=pad+i*(barH+gap);
+    const label=el("text",{x:8,y:y+barH*0.7,fill:"#cbd5e1","font-size":"10"}); label.textContent=`${i+1}.${t.name}`; svg.appendChild(label);
+    const x0=90, ww=((w-x0-20)*t.count/maxCount)||0;
+    const bar=el("rect",{x:x0,y:y,width:0,height:barH,rx:8,fill:"url(#gradBar)"}); svg.appendChild(bar);
+    const num=el("text",{x:x0+ww+6,y:y+barH*0.7,fill:"#94a3b8","font-size":"10"}); num.textContent=t.count; svg.appendChild(num);
+    setTimeout(()=> bar.setAttribute("width", ww), 50+i*40);
+  });
+  const defs=el("defs",{}); svg.appendChild(defs);
+  const lg=document.createElementNS("http://www.w3.org/2000/svg","linearGradient"); lg.id="gradBar"; lg.setAttribute("x1","0"); lg.setAttribute("x2","1");
+  const s1=document.createElementNS("http://www.w3.org/2000/svg","stop"); s1.setAttribute("offset","0"); s1.setAttribute("stop-color","#22d3ee");
+  const s2=document.createElementNS("http://www.w3.org/2000/svg","stop"); s2.setAttribute("offset","1"); s2.setAttribute("stop-color","#a78bfa");
+  lg.appendChild(s1); lg.appendChild(s2); defs.appendChild(lg);
+}
+function aggregate(items){
+  const mean={A:0,B:0,C:0,D:0,E:0,F:0}; items.forEach(it=> Object.keys(mean).forEach(k=> mean[k]+= (it.axes[k]||0)));
+  const n=items.length||1; Object.keys(mean).forEach(k=> mean[k]=+(mean[k]/n).toFixed(2));
+  const counts=new Map(); items.forEach(it=>{ const id=it.top?.[0]?.id; if(!id) return; counts.set(id,(counts.get(id)||0)+1); });
+  const arr=PERSONAS.map(p=>({id:p.id,name:p.name,count:counts.get(p.id)||0})).sort((a,b)=> b.count-a.count);
+  return { meanAxes:mean, topCounts:arr, size:n };
+}
+function readingFromTop(topCounts){
+  const topIds = topCounts.slice(0,6).map(t=>t.id);
+  const rs = []; topIds.forEach(id=>{ const p=PERSONAS.find(x=>x.id===id); if(p) rs.push({core:p.read.core[0]||"", extend:p.read.extend[0]||""}); });
+  const classical = [1,2,3,4,5,6];
+  if(!rs.length || !topIds.some(id=>classical.includes(id))){ const p=PERSONAS.find(x=>classical.includes(x.id)); if(p) rs.push({core:p.read.core[0], extend:p.read.extend[0]}); }
+  return rs;
+}
+function activitiesFromAxes(mean){
+  const a=[]; if(mean.A>=3.4) a.push("意象接力诗：小组接龙写“月/风/酒”等意象串联。");
+  if(mean.A<2.8) a.push("问题导向写作：先列事实，再提出可操作改进。");
+  if(mean.B>=3.5) a.push("规则内创新：在限定字数与主题下做“变体表达”。");
+  if(mean.B<2.7) a.push("结构先行：给作文画“逻辑地图”（论点-论据-反例）。");
+  if(mean.C>=3.5) a.push("积极叙事：把“挫折瞬间”改写成成长故事。");
+  if(mean.C<2.8) a.push("时事观察：一周三则“小新闻”摘记+观点短评。");
+  if(mean.D>=3.5) a.push("细节狙击：做“显微描写”训练，五感各一句。");
+  if(mean.D<2.7) a.push("豪放练习：仿写《将进酒》的夸张手法，50字以内。");
+  if(mean.E>=3.5) a.push("乡土图谱：共绘“我的小镇地图”，注人事物。");
+  if(mean.E<2.7) a.push("城市观察：地铁站一分钟写生，抓人群与秩序。");
+  if(mean.F>=3.5) a.push("温情通讯：写一封“谢谢你”的公开信。");
+  if(mean.F<2.7) a.push("批判清单：写一则“微批评”——只提建议不贴标签。");
+  if(a.length===0) a.push("对照阅读：苏轼《水调歌头》×李白《将进酒》，抓“情绪线与意象线”。");
+  return a.slice(0,6);
+}
+
+/* ====== Persistence & sharing ====== */
+function buildPayload(){
+  const v=state.vector;
+  const ranked = PERSONAS.map(p=>({ id:p.id, name:p.name, score:+toSimilarity(euclid(v,p.vec)).toFixed(4)}))
+                         .sort((a,b)=> b.score-a.score);
+  return {
+    classId: state.classId || "未分班",
+    studentId: cryptoRandomId(),
+    nickname: state.nickname || "同学",
+    axes: {A:+v.A.toFixed(2),B:+v.B.toFixed(2),C:+v.C.toFixed(2),D:+v.D.toFixed(2),E:+v.E.toFixed(2),F:+v.F.toFixed(2)},
+    top: ranked.slice(0,3),
+    finishedAt: Date.now(),
+    device: detectDevice()
+  };
+}
+function cryptoRandomId(){ try{ const a=new Uint8Array(8); (window.crypto&&crypto.getRandomValues)?crypto.getRandomValues(a):a.fill(0).forEach((_,i)=>a[i]=Math.floor(Math.random()*256)); return Array.from(a).map(x=>x.toString(16).padStart(2,"0")).join(""); }catch{ return Math.random().toString(16).slice(2,10); } }
+function detectDevice(){ const w=Math.min(window.innerWidth, (screen&&screen.width)||window.innerWidth); return w<680?"mobile":(w<980?"tablet":"desktop"); }
+function saveLocal(payload){
+  const key=`literature-quiz::${payload.classId}`;
+  try{ const arr=JSON.parse(Storage.getItem(key)||"[]"); arr.push(payload); Storage.setItem(key, JSON.stringify(arr)); }
+  catch(e){ console.warn("保存失败：",e); throw e; }
+}
+function loadClassLocal(classId){ try{ return JSON.parse(Storage.getItem(`literature-quiz::${classId}`) || "[]"); }catch(e){ return []; } }
+function downloadJSON(filename, obj){ const blob=new Blob([JSON.stringify(obj,null,2)],{type:"application/json"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=filename; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },0); }
+
+document.getElementById("saveLocal").addEventListener("click", ()=>{
+  const payload=buildPayload();
+  if(Storage.mode==="localStorage"){
+    try{ saveLocal(payload); toast(`已保存到本机“班级：${payload.classId}”`); }
+    catch{ toast("保存失败：存储被限制，将为你下载JSON文件"); downloadJSON(`quiz_${payload.classId}_${payload.nickname}.json`, payload); }
+  }else{
+    toast("沙盒限制：将下载JSON文件到本地"); downloadJSON(`quiz_${payload.classId}_${payload.nickname}.json`, payload);
+  }
+});
+document.getElementById("copyShare").addEventListener("click", async ()=>{
+  const payload=buildPayload(); const code=utoa(JSON.stringify(payload)); const ok=await copyText(code);
+  if(ok){ toast("分享码已复制，发送给老师即可导入"); } else { try{ prompt("复制以下分享码，发送给老师：", code); }catch{} }
+});
+async function copyText(text){
+  try{ if(navigator.clipboard && window.isSecureContext){ await navigator.clipboard.writeText(text); return true; } }catch(e){}
+  try{ const ta=document.createElement("textarea"); ta.value=text; ta.style.position="fixed"; ta.style.left="-9999px"; ta.style.top="-9999px"; document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, ta.value.length); const ok=document.execCommand("copy"); ta.remove(); return ok; }catch(e){ console.warn("复制失败：",e); return false; }
+}
+
+/* ====== Confetti & Toast ====== */
+function confetti(n=60){
+  const box=document.getElementById("confetti"); box.innerHTML=""; const colors=["#22d3ee","#a78bfa","#f472b6","#fbbf24","#4ade80","#60a5fa"];
+  for(let i=0;i<n;i++){ const p=document.createElement("i"); const left=Math.random()*100; const dur=2+Math.random()*2.5; const delay=Math.random()*0.8; p.style.left=left+"vw"; p.style.background=colors[Math.floor(Math.random()*colors.length)]; p.style.animationDuration=dur+"s"; p.style.animationDelay=delay+"s"; box.appendChild(p); }
+  if(n===0) box.innerHTML="";
+}
+function toast(text){
+  const t=document.createElement("div"); t.textContent=text;
+  t.style.position="fixed"; t.style.left="50%"; t.style.top="14px"; t.style.transform="translateX(-50%)";
+  t.style.background="rgba(0,0,0,.7)"; t.style.color="#fff"; t.style.padding="10px 14px"; t.style.borderRadius="999px";
+  t.style.zIndex=9999; t.style.fontSize="14px"; t.style.border="1px solid rgba(255,255,255,.2)";
+  document.body.appendChild(t); setTimeout(()=> t.remove(), 1800);
+}
+
+/* ====== Export report (no window.print) ====== */
+/* 将SVG转成PNG DataURL */
+function svgToPngDataUrl(svgEl){
+  return new Promise((resolve, reject)=>{
+    try{
+      const svg = svgEl.cloneNode(true);
+      const vb = (svg.getAttribute("viewBox")||"0 0 260 240").split(/\s+/).map(Number);
+      const [x,y,w,h] = vb.length===4 ? vb : [0,0,260,240];
+      const s = new XMLSerializer().serializeToString(svg);
+      const blob = new Blob([s], {type:"image/svg+xml;charset=utf-8"});
+      const url = URL.createObjectURL(blob);
+      const img = new Image();
+      img.onload = ()=>{
+        try{
+          const canvas = document.createElement("canvas");
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, w, h);
+          const data = canvas.toDataURL("image/png");
+          URL.revokeObjectURL(url);
+          resolve({ data, w, h });
+        }catch(err){ URL.revokeObjectURL(url); reject(err); }
+      };
+      img.onerror = (e)=>{ URL.revokeObjectURL(url); reject(e); };
+      img.src = url;
+    }catch(e){ reject(e); }
+  });
+}
+
+/* 在Canvas上排版整页（含中文），再作为图片放进PDF */
+async function renderReportCanvas({ classId, items }){
+  const stats = aggregate(items);
+  const reading = readingFromTop(stats.topCounts);
+  const acts = activitiesFromAxes(stats.meanAxes);
+
+  // A4 @ 150dpi (像素)
+  const W = 1240, H = 1754, pad = 60;
+  const canvas = document.createElement("canvas");
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#ffffff"; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle = "#111827";
+
+  // 标题
+  ctx.font = "bold 36px system-ui, -apple-system, Segoe UI, Roboto, PingFang SC, Microsoft YaHei";
+  ctx.fillText(`班级画像报告 · ${classId}`, pad, pad+20);
+  ctx.font = "14px system-ui, -apple-system, Segoe UI, Roboto, PingFang SC, Microsoft YaHei";
+  const ts = new Date().toLocaleString();
+  ctx.fillText(`样本量：${stats.size}    生成时间：${ts}`, pad, pad+50);
+
+  // 图表
+  const radarSvg = document.getElementById("tRadar");
+  const barSvg = document.getElementById("tBars");
+  const [radarPNG, barPNG] = await Promise.all([svgToPngDataUrl(radarSvg), svgToPngDataUrl(barSvg)]);
+  // 放置位置
+  const chartY = pad + 80;
+  const rw = 520, rh = 480 * (radarPNG.h / radarPNG.w); // 按宽度缩放
+  const bw = 520, bh = 480 * (barPNG.h / barPNG.w);
+  // 左图
+  const rImg = await loadImage(radarPNG.data);
+  ctx.drawImage(rImg, pad, chartY, rw, rh);
+  // 右图
+  const bImg = await loadImage(barPNG.data);
+  ctx.drawImage(bImg, pad + rw + 40, chartY, bw, bh);
+
+  // 分割线
+  const textY = chartY + Math.max(rh, bh) + 40;
+  ctx.strokeStyle = "#e5e7eb"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(pad, textY); ctx.lineTo(W-pad, textY); ctx.stroke();
+
+  // 小标题
+  let y = textY + 36;
+  ctx.font = "bold 20px system-ui, -apple-system, Segoe UI, Roboto, PingFang SC, Microsoft YaHei";
+  ctx.fillText("阅读清单（建议）", pad, y);
+  y += 10;
+
+  // 阅读清单
+  ctx.font = "16px system-ui, -apple-system, Segoe UI, Roboto, PingFang SC, Microsoft YaHei";
+  y = drawBullets(ctx, reading.map(r=>`教材：${r.core}｜拓展：${r.extend}`), pad, y+16, W- pad*2, 24);
+
+  // 教学活动建议
+  y += 16;
+  ctx.font = "bold 20px system-ui, -apple-system, Segoe UI, Roboto, PingFang SC, Microsoft YaHei";
+  ctx.fillText("教学活动建议", pad, y);
+  ctx.font = "16px system-ui, -apple-system, Segoe UI, Roboto, PingFang SC, Microsoft YaHei";
+  y = drawBullets(ctx, acts.map(a=>"• "+a), pad, y+16, W - pad*2, 26);
+
+  return canvas;
+}
+function loadImage(src){
+  return new Promise((resolve, reject)=>{ const img=new Image(); img.onload=()=>resolve(img); img.onerror=reject; img.src=src; });
+}
+function drawBullets(ctx, lines, x, y, maxWidth, lineHeight){
+  ctx.fillStyle = "#374151";
+  const wrap = (text)=>{
+    const rows=[]; let line="";
+    for(const ch of text){
+      const test = line + ch;
+      if(ctx.measureText(test).width > maxWidth){
+        rows.push(line); line = ch;
+      }else line = test;
+    }
+    if(line) rows.push(line);
+    return rows;
+  };
+  for(const l of lines){
+    const rows = wrap(l);
+    for(const r of rows){ ctx.fillText(r, x, y); y += lineHeight; }
+  }
+  return y;
+}
+
+/* 生成并下载PDF（或PNG兜底） */
+async function exportClassReport({ classId, items }){
+  const canvas = await renderReportCanvas({ classId, items });
+  const dataURL = canvas.toDataURL("image/png");
+
+  const hasJsPDF = !!(window.jspdf && window.jspdf.jsPDF);
+  if(hasJsPDF){
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit:"pt", format:"a4" }); // 595x842 pt
+    // 把A4@150dpi图等比缩放到A4纸
+    const img = dataURL;
+    const pageW = doc.internal.pageSize.getWidth();
+    const pageH = doc.internal.pageSize.getHeight();
+    doc.addImage(img, "PNG", 0, 0, pageW, pageH);
+    doc.save(`班级画像_${classId}.pdf`);
+    toast("PDF 已导出");
+  }else{
+    // 兜底：导出PNG
+    downloadImage(`班级画像_${classId}.png`, dataURL);
+    toast("环境不支持PDF库，已导出PNG图片");
+  }
+}
+function downloadImage(filename, dataURL){
+  const a=document.createElement("a"); a.href=dataURL; a.download=filename; document.body.appendChild(a); a.click(); setTimeout(()=>a.remove(),0);
+}
+
+/* ====== Optional server hook ====== */
+async function postToServer(payload){
+  const url = ""; if(!url) return false;
+  try{ await fetch(url,{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}); return true; }catch{ return false; }
+}
+
+/* Shortcuts */
+document.addEventListener("keydown",(e)=>{ if(e.key==="ArrowRight" && quiz.classList.contains("active")) nextQ(); if(e.key==="ArrowLeft" && quiz.classList.contains("active")) prevQ(); });
+</script>
+</body>
+</html>
